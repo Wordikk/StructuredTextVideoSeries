@@ -12,7 +12,7 @@
 			</Tasks>
 		</System>
 		<Plc>
-			<Project File="Untitled1.xti"/>
+			<Project File="PizzaProject.xti"/>
 		</Plc>
 	</Project>
 </TcSmProject>

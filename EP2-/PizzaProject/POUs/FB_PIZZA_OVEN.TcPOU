@@ -40,7 +40,6 @@ IF stPizzaOnDeck.bExist AND NOT stPizzaInOven.bExist THEN
 	stPizzaOnDeck := stNULL_PIZZA;  // Remove pizza.
 END_IF
 
-
 // Handle buttons... / sim inputs
 fbLoad_RTRIG(clk := bLoadPizza);
 IF fbLoad_RTRIG.Q THEN
@@ -58,18 +57,17 @@ IF fbRemove_RTRIG.Q THEN
 	//bRemovePizza := FALSE;
 END_IF
 
-CASE iState OF
-	
+CASE iState OF	
 	0:  // Wait for pizza in oven.
-		sStateDesc := 'Waiting on Pizza Now.';
+		sStateDesc := 'Oczkiewanie na pizze w piecu';
 		IF stPizzaInOven.bExist THEN
 			stPizzaInOven.dtTimeEnteredOven := dtCurrentTime;
 			iState := 10;
 		END_IF
 
 	10: // We just got a pizza! Cook it.
-		sStateDesc := 'Baking That Pizza Now.';
-		fbMyTimer(IN:=TRUE,PT:=T#3S);
+		sStateDesc := 'Pieczenie pizzy';
+		fbMyTimer(IN:=TRUE,PT:=T#5S);
 		IF fbMyTimer.Q THEN
 			fbMyTimer(IN:=FALSE);
 			iState := 20;	
@@ -78,7 +76,7 @@ CASE iState OF
 	
 	20: // Can we move the pizza out of the oven?  Its going to burn.
 	
-		sStateDesc := 'PIZZA BURNING!!!!.';
+		sStateDesc := 'UWAGA! PIZZA SIĘ PRZYPALA';
 	
 		IF NOT stPizzaDone.bExist THEN
 		
@@ -105,7 +103,7 @@ CASE iState OF
 	
 ELSE
 	
-	sStateDesc := 'Invalid state!';
+	sStateDesc := 'Invalid state.';
 
 END_CASE
 
@@ -113,11 +111,11 @@ END_CASE
 // Start state history:
 
 IF iLastState <> iState THEN
-
 	// Do stuff here to log transitions.... 
-	F_FIFO_WRITE(cbData := SIZEOF(sStateDesc), pData := ADR(sStateDesc),
-					cbBuffer := SIZEOF(arrStateDescHistory), pBuffer := ADR(arrStateDescHistory)
-	);
+	F_FIFO_WRITE(cbData := SIZEOF(sStateDesc), 
+				pData := ADR(sStateDesc),
+				cbBuffer := SIZEOF(arrStateDescHistory), 
+				pBuffer := ADR(arrStateDescHistory));
 	
 	// Reset for next time.
 	iLastState := iState;
